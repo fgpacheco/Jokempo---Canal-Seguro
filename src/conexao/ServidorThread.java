@@ -11,6 +11,8 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.ArrayList;
+
+import jdk.management.resource.internal.inst.SocketOutputStreamRMHooks;
 /**
  *
  * @author Felipe
@@ -44,6 +46,7 @@ public class ServidorThread extends Thread {
             resultado();
             
             if(list.size() == 2) {
+            	System.out.println("OK");
                 return;
             }
 

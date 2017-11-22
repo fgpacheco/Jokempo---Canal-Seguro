@@ -8,11 +8,9 @@ package conexao;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
-import javax.swing.JOptionPane;
 
 /**
  *
@@ -26,22 +24,24 @@ public class Servidor {
         Socket socket;
         ArrayList<BufferedReader> jogadores = new ArrayList<>();
         ArrayList<String> listEscolhas = new ArrayList<>();
-        
-        try {
-            serverSocket = new ServerSocket(12345);
-            System.out.println("Aguardando jogadores...");
-
-            while(true) {
-                socket = serverSocket.accept();
-                jogadores.add(new BufferedReader(new InputStreamReader(socket.getInputStream())));
-                
-                new ServidorThread(socket, jogadores, listEscolhas).start();
-            }
-
-        } catch (IOException ex) {
-            JOptionPane.showMessageDialog(null, "Problema no servidor...\n" + ex.getMessage(),
-                    "", JOptionPane.ERROR_MESSAGE);
-        } 
+        	
+//        try{
+//                    serverSocket = new ServerSocket(12345);
+		        	Conexao c = new Conexao(12345);
+//		            System.out.println("Aguardando jogadores...");
+		            c.init();
+		
+		            while(true) {
+//		                socket = serverSocket.accept();
+//		                jogadores.add(new BufferedReader(new InputStreamReader(socket.getInputStream())));
+//		                
+//		               
+//		                new ServidorThread(socket, jogadores, listEscolhas).start();
+		            }
+//        }catch (IOException e) {
+//			// TODO: handle exception
+//        	e.printStackTrace();
+//		}
         
     }
 }

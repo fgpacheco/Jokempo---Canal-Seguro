@@ -6,6 +6,8 @@
 package gui;
 
 import conexao.Cliente;
+import conexao.Conexao;
+
 import java.awt.Color;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -19,6 +21,10 @@ import javax.swing.JOptionPane;
 public class JokempoCliente extends javax.swing.JFrame {
 
     /**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+	/**
      * Creates new form Jokenpo
      */
     
@@ -32,14 +38,16 @@ public class JokempoCliente extends javax.swing.JFrame {
         
         lbEscolha.setForeground(Color.BLUE);
         
-        cliente = new Cliente("127.0.0.1", "12345");
-        socket = cliente.conectar();
+//        cliente = new Cliente("127.0.0.1", "12345");
+//        socket = cliente.conectar();
+        Conexao conexao = new Conexao("127.0.0.1",12345);
+        conexao.init();
         
-        if(socket == null) {
-            JOptionPane.showMessageDialog(null, "Servidor não ativo...\n", 
-                    "", JOptionPane.ERROR_MESSAGE);
-            System.exit(0);
-        }       
+//        if(socket == null) {
+//            JOptionPane.showMessageDialog(null, "Servidor não ativo...\n", 
+//                    "", JOptionPane.ERROR_MESSAGE);
+//            System.exit(0);
+//        }       
         
     }
 

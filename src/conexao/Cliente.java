@@ -24,7 +24,11 @@ public class Cliente {
         this.porta = porta;        
     }
 
-    public String getIp() {
+    public Cliente() {
+		// TODO Auto-generated constructor stub
+	}
+
+	public String getIp() {
         return ip;
     }
 
