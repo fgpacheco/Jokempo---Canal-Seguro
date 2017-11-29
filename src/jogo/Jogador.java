@@ -5,95 +5,65 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-
+import java.io.Serializable;
 import java.util.Scanner;
 
 import com.sun.org.apache.xerces.internal.impl.dv.util.Base64;
 
-import conexao.Cliente;
-import java.io.Serializable;
-
 public class Jogador implements Serializable {
 
-    private Cliente cliente;
-    private String nome;
-    private int escolha;
+	private String nome;
+	private String escolha;
 
-    public Jogador(String nome) {
-        this.cliente = new Cliente("localhost", 12345);
-        this.nome = nome;
-    }
+	public Jogador(String nome, String escolha) {
+		this.nome = nome;
+		this.escolha = escolha;	
+	}
 
-    public Cliente getCliente() {
-        return cliente;
-    }
+	public String getNome() {
+		return nome;
+	}
 
-    public void setCliente(Cliente cliente) {
-        this.cliente = cliente;
-    }
+	public void setNome(String nome) {
+		this.nome = nome;
+	}
 
-    public String getNome() {
-        return nome;
-    }
+	public String getEscolha() {
+		return escolha;
+	}
 
-    public void setNome(String nome) {
-        this.nome = nome;
-    }
+	public void setEscolha(String escolha) {
+		this.escolha = escolha;
+	}	
 
-    public int getEscolha() {
-        return escolha;
-    }    
+	public static String convertToString(Jogador c) {		
+		try {
+			String str;
+			ByteArrayOutputStream baos = new ByteArrayOutputStream();
+			ObjectOutputStream oos = new ObjectOutputStream(baos);
+			oos.writeObject(c);
+			byte[] objeto = baos.toByteArray();
+			str = Base64.encode(objeto);
+			oos.close();
+			return str;
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 
-    public void jogar() {
+		return null;
+	}
 
-        cliente.conectar();
+	public static Jogador convertFromString(String str) {
+		try {
+			ByteArrayInputStream bais = new ByteArrayInputStream(Base64.decode(str));
+			ObjectInputStream ois = new ObjectInputStream(bais);
+			return (Jogador) ois.readObject();
+		} catch (IOException e) {
+			e.printStackTrace();
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		}
+		return null;		
+	}
 
-        Scanner scan = new Scanner(System.in);
-
-        System.out.println("Escolha uma jogada:\n"
-                + "1 - Papel\n"
-                + "2 - Pedra\n"
-                + "3 - Tesoura\n");
-
-        int escolha = scan.nextInt();
-        
-        this.escolha = escolha;       
-        
-
-    }
-
-    public static String convertToString(Jogador obj) {
-        try {
-            String str;
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            ObjectOutputStream oos = new ObjectOutputStream(baos);
-            oos.writeObject(obj);
-            byte[] objeto = baos.toByteArray();
-            str = Base64.encode(objeto);
-            oos.close();
-            return str;
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
-
-    public static Jogador convertFromString(String str) {
-        try {
-            ByteArrayInputStream bais = new ByteArrayInputStream(Base64.decode(str));
-            ObjectInputStream ois = new ObjectInputStream(bais);
-            return (Jogador) ois.readObject();
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
-
-    @Override
-    public String toString() {
-        return String.format("Nome: %s\nEscolha: %d", nome, escolha);
-    }
-    
 }
