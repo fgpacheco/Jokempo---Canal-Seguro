@@ -1,5 +1,6 @@
 package main;
 
+import java.io.IOException;
 import java.util.Scanner;
 import conexao.Cliente;
 import conexao.Servidor;
@@ -29,8 +30,22 @@ public class ClienteMain {
 		Jogador jogador = new Jogador(nome, Partida.escolhaToString(escolha));
 		String msg;
 		
+		
+		
 		msg = Jogador.convertToString(jogador);
 		c.enviar(msg);
+		
+		String s = null;
+		
+		try {
+			while(s == null) {
+				s = c.receber();								
+			}
+		} catch (IOException e) {			
+			e.printStackTrace();
+		}
+		
+		System.out.println(s);
 
 	}
 }

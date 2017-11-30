@@ -53,4 +53,8 @@ public class Cliente {
     	out.println(msg);
 	}
     
+    public String receber() throws IOException {
+    	return in.readLine();
+	}
+    
 }

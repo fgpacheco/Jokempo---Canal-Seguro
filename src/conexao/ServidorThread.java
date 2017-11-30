@@ -3,8 +3,11 @@ package conexao;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.ArrayList;
+
+import com.sun.prism.paint.Stop;
 
 import jogo.Jogador;
 
@@ -23,30 +26,39 @@ public class ServidorThread implements Runnable{
 	@Override
 	public void run() {
 		BufferedReader in;
+		PrintWriter out;
 
 		try {
 			in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+			out = new PrintWriter(socket.getOutputStream(), true);
 
 			String msg = null;
 			Jogador jogador;
 
 			while((msg = in.readLine()) != null) {				
 				jogador = Jogador.convertFromString(msg);
+				System.out.println(jogador.getNome());
 				
-				synchronized (this) {					
+				synchronized (this.servidor) {					
 					servidor.getPartida().add(jogador);
 
 					if(servidor.getPartida().getJogadores().size() == 2) {					
-						notifyAll();					
+						//this.servidor.trava.notifyAll();
+						this.servidor.notifyAll();
 					} else {					
-						wait();
+						//this.servidor.trava.wait();
+						this.servidor.wait();
 					}
+					
+					msg = servidor.resultado().getNome();
+					out.println(msg);				
+					
 				}
-				System.out.println("aaa" + jogador);
+				//System.out.println(jogador.getNome());
 			}
+			
 
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
+		} catch (IOException e) {			
 			e.printStackTrace();
 		} catch (Exception e) {
 			e.printStackTrace();
