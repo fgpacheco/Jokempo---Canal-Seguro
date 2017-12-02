@@ -1,57 +1,60 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package conexao;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
 import java.net.Socket;
-import javax.swing.JOptionPane;
 
-/**
- *
- * @author Felipe
- */
 public class Cliente {
     
-    private String ip;
-    private String porta;
+    private String host;
+    private int porta;
     private Socket socket;
+    private PrintWriter out;
+    private BufferedReader in;
     
-    public Cliente(String ip, String porta) {
-        this.ip = ip;
+    
+    public Cliente(String host, int porta) {
+        this.host = host;
         this.porta = porta;        
     }
-
-    public Cliente() {
-		// TODO Auto-generated constructor stub
-	}
-
-	public String getIp() {
-        return ip;
+    
+	public String getHost() {
+        return host;
     }
 
-    public void setIp(String ip) {
-        this.ip = ip;
+    public void setHost(String host) {
+        this.host = host;
     }
 
-    public String getPorta() {
+    public int getPorta() {
         return porta;
     }
 
-    public void setPorta(String porta) {
+    public void setPorta(int porta) {
         this.porta = porta;
     }
     
-    public Socket conectar() {
+    public void conectar() {
         try {
-            socket = new Socket("127.0.0.1", 12345);            
-            return socket;
+            socket = new Socket(host, porta);   
+            System.out.println("Cliente conectado!");
+            
+            out = new PrintWriter(socket.getOutputStream(), true);
+            in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+            
         } catch (IOException ex) {
-            ex.printStackTrace();            
-            return null;
+            ex.printStackTrace();
         }
-    }   
+    }
+    
+    public void enviar(String msg) {
+    	out.println(msg);
+	}
+    
+    public String receber() throws IOException {
+    	return in.readLine();
+	}
     
 }

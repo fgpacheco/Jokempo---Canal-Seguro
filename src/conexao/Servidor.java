@@ -1,47 +1,66 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package conexao;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
-/**
- *
- * @author Felipe
- */
+import jogo.Partida;
+import jogo.Jogador;
+
 public class Servidor {
-
-    public static void main(String[] args) {
-
-        ServerSocket serverSocket;
-        Socket socket;
-        ArrayList<BufferedReader> jogadores = new ArrayList<>();
-        ArrayList<String> listEscolhas = new ArrayList<>();
-        	
-//        try{
-//                    serverSocket = new ServerSocket(12345);
-		        	Conexao c = new Conexao(12345);
-//		            System.out.println("Aguardando jogadores...");
-		            c.init();
+	
+	public static final int PORTA = 5000;
+	private ServerSocket serverSocket;
+	private Socket socket;
+	private ExecutorService executor;
+	private int contador = 0;
+	private Partida partida;
+	public Object trava = new Object();
+	
+	public Servidor() {
+		try {
+			serverSocket = new ServerSocket(PORTA);
+			executor = Executors.newFixedThreadPool(2);		
+			partida = new Partida();
+		} catch (IOException e) {			
+			e.printStackTrace();
+		}
+	}
+	
+	public void start() {
+		System.out.println("Aguardando o cliente...");	
 		
-		            while(true) {
-//		                socket = serverSocket.accept();
-//		                jogadores.add(new BufferedReader(new InputStreamReader(socket.getInputStream())));
-//		                
-//		               
-//		                new ServidorThread(socket, jogadores, listEscolhas).start();
-		            }
-//        }catch (IOException e) {
-//			// TODO: handle exception
-//        	e.printStackTrace();
-//		}
-        
-    }
+		while(true) {
+			try {
+				socket = serverSocket.accept();				
+				System.out.println("Cliente conectado");
+				
+				executor.execute(new ServidorThread(socket, contador, this));
+				contador++;				
+				
+				//new ServidorThread(socket).start();	
+			} catch (IOException e) {				
+				e.printStackTrace();
+			}				
+		}		
+	}
+
+	public Partida getPartida() {
+		return partida;
+	}
+
+	public void setPartida(Partida partida) {
+		this.partida = partida;
+	}
+	
+	public Jogador resultado() {		
+		return partida.vencedor();	
+	}
+	
+	
+	
+
 }
