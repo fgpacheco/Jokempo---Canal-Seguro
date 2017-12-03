@@ -6,6 +6,7 @@ import conexao.Cliente;
 import conexao.Servidor;
 import jogo.Jogador;
 import jogo.Partida;
+import utils.Conversor;
 
 public class ClienteMain {
 	
@@ -22,30 +23,31 @@ public class ClienteMain {
 		System.out.println("Escolha uma jogada:\n" +
 				"1 - Papel\n" + 
 				"2 - Pedra\n" +
-				"3 - Tesoura\n" +
-				"0 - SAIR\n");
+				"3 - Tesoura\n");
 		
 		int escolha = scan.nextInt();
 		
 		Jogador jogador = new Jogador(nome, Partida.escolhaToString(escolha));
-		String msg;
+		String msg;		
 		
-		
-		
-		msg = Jogador.convertToString(jogador);
+		msg = Conversor.convertToString(jogador);
 		c.enviar(msg);
 		
-		String s = null;
+		String resposta = null;
 		
 		try {
-			while(s == null) {
-				s = c.receber();								
+			while(resposta == null) {
+				resposta = c.receber();								
 			}
 		} catch (IOException e) {			
 			e.printStackTrace();
 		}
 		
-		System.out.println(s);
+		jogador = (Jogador) Conversor.convertFromString(resposta);
+		
+		String resultado = (jogador == null) ? "Empate" : jogador.getNome() + " venceu: " + jogador.getEscolha();
+		
+		System.out.println(resultado);
 
 	}
 }

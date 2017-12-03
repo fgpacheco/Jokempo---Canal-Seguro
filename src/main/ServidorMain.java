@@ -9,13 +9,5 @@ public class ServidorMain {
 		Servidor servidor = new Servidor();		
 		servidor.start();
 		
-		for(Jogador j : servidor.getPartida().getJogadores()) {
-			System.out.println(j.getNome() + " " + j.getEscolha());			
-		}
-		
-		System.out.println(servidor.resultado());
-		
-		
 	}
-
 }

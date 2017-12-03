@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import com.sun.prism.paint.Stop;
 
 import jogo.Jogador;
+import utils.Conversor;
 
 public class ServidorThread implements Runnable{
 
@@ -36,7 +37,7 @@ public class ServidorThread implements Runnable{
 			Jogador jogador;
 
 			while((msg = in.readLine()) != null) {				
-				jogador = Jogador.convertFromString(msg);
+				jogador = (Jogador) Conversor.convertFromString(msg);
 				System.out.println(jogador.getNome());
 				
 				synchronized (this.servidor) {					
@@ -50,11 +51,10 @@ public class ServidorThread implements Runnable{
 						this.servidor.wait();
 					}
 					
-					msg = servidor.resultado().getNome();
-					out.println(msg);				
-					
+					jogador = servidor.resultado();
+					msg = Conversor.convertToString(jogador);
+					out.println(msg);
 				}
-				//System.out.println(jogador.getNome());
 			}
 			
 
