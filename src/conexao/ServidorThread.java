@@ -17,6 +17,7 @@ public class ServidorThread implements Runnable{
 	private Socket socket;
 	private int contador;	
 	private Servidor servidor;
+	
 
 	public ServidorThread(Socket socket, int contador, Servidor servidor) {
 		this.socket = socket;

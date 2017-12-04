@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
+import java.security.NoSuchAlgorithmException;
 import java.security.PublicKey;
 
 import seguranca.Seguranca;
@@ -48,8 +49,12 @@ public class Cliente {
 			socket = new Socket(host, porta);   
 			System.out.println("Cliente conectado!");
 			
-			seguranca.gerarChaves();
-			seguranca.obterPublicaDestinatario();			
+//			seguranca = new Seguranca(socket);
+			seguranca.obterPublicaDestinatario();
+			seguranca.criarChaveSessao();
+			seguranca.enviarChaveSimetrica();
+//			System.out.println(seguranca.getChaveAutenticacaoServer());
+//			System.out.println(seguranca.getChaveAutenticacaoClient());
 
 			out = new PrintWriter(socket.getOutputStream(), true);
 			in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
@@ -62,6 +67,9 @@ public class Cliente {
 
 		} catch (IOException ex) {
 			ex.printStackTrace();
+		} catch (NoSuchAlgorithmException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 	}
 
