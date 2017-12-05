@@ -28,24 +28,27 @@ public class ClienteMain {
 		int escolha = scan.nextInt();
 		
 		Jogador jogador = new Jogador(nome, Partida.escolhaToString(escolha));
-		String msg;		
+		//String msg;		
 		
-		msg = Conversor.convertToString(jogador);
-		c.enviar(msg);
+		//msg = Conversor.convertToString(jogador);
+		c.enviar(jogador);
 		
-		String resposta = null;
+		//String resposta = null;
+		Jogador vencedor = null;
 		
 		try {
-			while(resposta == null) {
-				resposta = c.receber();								
+			while(vencedor == null) {
+				vencedor = c.receber();								
 			}
 		} catch (IOException e) {			
 			e.printStackTrace();
+		} catch (ClassNotFoundException e) {			
+			e.printStackTrace();
 		}
 		
-		jogador = (Jogador) Conversor.convertFromString(resposta);
+		//jogador = (Jogador) Conversor.convertFromString(resposta);
 		
-		String resultado = (jogador == null) ? "Empate" : jogador.getNome() + " venceu: " + jogador.getEscolha();
+		String resultado = (vencedor == null) ? "Empate" : vencedor.getNome() + " venceu: " + vencedor.getEscolha();
 		
 		System.out.println(resultado);
 

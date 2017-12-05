@@ -48,10 +48,12 @@ public class Servidor {
 	
 	public void start() {
 		System.out.println("Aguardando o cliente...");	
-		seguranca.gerarChaves();
 		
-		if(!Arquivos.isChavePublica())
+		if(!Arquivos.isChavePublica()) {
+			seguranca.gerarChaves();
 			seguranca.salvarChavePublica();
+			seguranca.salvarChavePrivada();
+		}
 		
 		
 		while(true) {
@@ -59,7 +61,7 @@ public class Servidor {
 				socket = serverSocket.accept();				
 				System.out.println("Cliente conectado");
 				
-				executor.execute(new ServidorThread(socket, contador, this));
+				executor.execute(new ServidorThread(socket, contador, this, seguranca));
 				contador++;
 				
 			} catch (IOException e) {				

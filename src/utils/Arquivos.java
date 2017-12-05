@@ -10,13 +10,20 @@ import java.io.ObjectOutputStream;
 
 public class Arquivos {
 	
-	public static final String PATH = "keys/public.key";
+	public static final String PATH_PUBLIC = "keys/public.key";
 	
-	public static void gravarObjeto(Object obj) {
+	public static final String PATH_PRIVATE = "keys/private.key";
+	
+		
+	public static void gravarObjeto(Object obj, String tipo) {
 		
 		ObjectOutputStream out;
 		try {
-			out = new ObjectOutputStream(new FileOutputStream(PATH));
+			if(tipo.equals("publica"))
+				out = new ObjectOutputStream(new FileOutputStream(PATH_PUBLIC));
+			else
+				out = new ObjectOutputStream(new FileOutputStream(PATH_PRIVATE));
+			
 			out.writeObject(obj);
 		} catch (IOException e) {			
 			e.printStackTrace();
@@ -28,7 +35,7 @@ public class Arquivos {
 		
 		ObjectInputStream in = null;
 		try {	
-			in = new ObjectInputStream(new FileInputStream(PATH));
+			in = new ObjectInputStream(new FileInputStream(PATH_PUBLIC));
 			return in.readObject();			
 		} catch (IOException e) {			
 			e.printStackTrace();
@@ -40,7 +47,7 @@ public class Arquivos {
 	}
 	
 	public static boolean isChavePublica() {
-		File f = new File(PATH);
+		File f = new File(PATH_PUBLIC);
 		if(f.isFile())
 			return true;
 		
