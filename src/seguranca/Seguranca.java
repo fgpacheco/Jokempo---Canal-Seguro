@@ -1,10 +1,5 @@
 package seguranca;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.net.Socket;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.NoSuchAlgorithmException;
@@ -17,7 +12,6 @@ import java.security.Security;
 import javax.crypto.Cipher;
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
-import javax.crypto.spec.SecretKeySpec;
 
 import utils.Arquivos;
 
@@ -26,15 +20,10 @@ public class Seguranca {
 	private KeyPairGenerator assimetrica;
 	private PrivateKey chavePrivada;
 	private PublicKey chavePublica;
-	public PublicKey chavePublicaDestinatario;
+	private PublicKey chavePublicaDestinatario;
 	private SecretKey chaveSimetrica;
 	
-//	private SecretKey chaveEncriptacaoServer;
-//	private SecretKey chaveEncriptacaoClient;
-//	private SecretKey chaveAutenticacaoServer;
-//	private SecretKey chaveAutenticacaoClient;
-	
-	public Sessao sessao;  
+	private Sessao sessao;  
 	
 	public Seguranca(){
 		
@@ -63,30 +52,26 @@ public class Seguranca {
 		System.out.println("Chaves publica e privadas criadas com sucesso!");
 	}
 	
-	private void gerarChaveSimetrica() {
-		try {
-			KeyGenerator keygenerator = KeyGenerator.getInstance("AES");
-			chaveSimetrica = keygenerator.generateKey();
-
-			System.out.println("Chave simetrica criada com sucesso!");
-		} catch (NoSuchAlgorithmException e) {		
-			e.printStackTrace();
-		}
+	public void salvarChavePublica() {
+		Arquivos.gravarObjeto(chavePublica, "publica");
+		System.out.println("Chave pÃºblica armazenada!");
 	}
 	
-	public void salvarChavePublica() {
-		Arquivos.gravarObjeto(chavePublica);
-		System.out.println("Chave pública armazenada!");
+	public void salvarChavePrivada() {
+		Arquivos.gravarObjeto(chavePrivada, "privada");
+		System.out.println("Chave privada armazenada!");
 	}
 	
 	public void obterPublicaDestinatario() {		
 		chavePublicaDestinatario = (PublicKey) Arquivos.lerObjeto();
-		System.out.println("Chave pública lida com sucesso no cliente!");				
+		System.out.println("Chave pÃºblica lida com sucesso no cliente!");				
 	}
+	
+	
 		
 	
 	/**
-	 * Criptografa o texto puro usando a chave pública.
+	 * Criptografa o texto puro usando a chave pï¿½blica.
 	 */
 	public byte[] criptografa(byte[] texto, PublicKey chave) {
 		byte[] cipherText = null;
@@ -151,5 +136,56 @@ public class Seguranca {
 		this.chavePrivada = chavePrivada;
 	}
 
+	public KeyPairGenerator getAssimetrica() {
+		return assimetrica;
+	}
+
+	public void setAssimetrica(KeyPairGenerator assimetrica) {
+		this.assimetrica = assimetrica;
+	}
+
+	public PublicKey getChavePublica() {
+		return chavePublica;
+	}
+
+	public void setChavePublica(PublicKey chavePublica) {
+		this.chavePublica = chavePublica;
+	}
+
+	public PublicKey getChavePublicaDestinatario() {
+		return chavePublicaDestinatario;
+	}
+
+	public void setChavePublicaDestinatario(PublicKey chavePublicaDestinatario) {
+		this.chavePublicaDestinatario = chavePublicaDestinatario;
+	}
+
+	public SecretKey getChaveSimetrica() {
+		return chaveSimetrica;
+	}
+
+	public void setChaveSimetrica(SecretKey chaveSimetrica) {
+		this.chaveSimetrica = chaveSimetrica;
+	}
+
+	public Sessao getSessao() {
+		return sessao;
+	}
+
+	public void setSessao(Sessao sessao) {
+		this.sessao = sessao;
+	}
+	
+	
+	/*private void gerarChaveSimetrica() {
+	try {
+		KeyGenerator keygenerator = KeyGenerator.getInstance("AES");
+		chaveSimetrica = keygenerator.generateKey();
+		System.out.println("Chave simetrica criada com sucesso!");
+	} catch (NoSuchAlgorithmException e) {		
+		e.printStackTrace();
+	}
+}*/
+	
 
 }

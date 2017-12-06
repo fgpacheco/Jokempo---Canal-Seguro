@@ -5,6 +5,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 
+import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 
 import seguranca.Seguranca;
@@ -28,13 +29,13 @@ public class Comunicacao {
 	
 	public void enviarChaveSimetrica() {
 		try {
-			byte[] ciphertext = seguranca.criptografa(seguranca.sessao.getChaveEncriptacaoClient().getEncoded(), seguranca.chavePublicaDestinatario);	
+			byte[] ciphertext = seguranca.criptografa(seguranca.getSessao().getChaveEncriptacaoClient().getEncoded(), seguranca.getChavePublicaDestinatario());	
 			output.writeObject(ciphertext);
-			byte[] ciphertext1 = seguranca.criptografa(seguranca.sessao.getChaveEncriptacaoServer().getEncoded(), seguranca.chavePublicaDestinatario);	
+			byte[] ciphertext1 = seguranca.criptografa(seguranca.getSessao().getChaveEncriptacaoServer().getEncoded(), seguranca.getChavePublicaDestinatario());	
 			output.writeObject(ciphertext1);
-			byte[] ciphertext2 = seguranca.criptografa(seguranca.sessao.getChaveAutenticacaoClient().getEncoded(), seguranca.chavePublicaDestinatario);	
+			byte[] ciphertext2 = seguranca.criptografa(seguranca.getSessao().getChaveAutenticacaoClient().getEncoded(), seguranca.getChavePublicaDestinatario());	
 			output.writeObject(ciphertext2);
-			byte[] ciphertext3 = seguranca.criptografa(seguranca.sessao.getChaveAutenticacaoServer().getEncoded(), seguranca.chavePublicaDestinatario);	
+			byte[] ciphertext3 = seguranca.criptografa(seguranca.getSessao().getChaveAutenticacaoServer().getEncoded(), seguranca.getChavePublicaDestinatario());	
 			output.writeObject(ciphertext3);
 			
 		} catch (IOException e) {
@@ -42,17 +43,21 @@ public class Comunicacao {
 		}
 	}
 	
-	public void receberChaveSimetrica() {
+	public SecretKey receberChaveSimetrica() {
 		try {
 			byte[] ba = (byte[]) input.readObject();
 			byte[] decryptedText = seguranca.decriptografa(ba, seguranca.getChavePrivada());
 
-			chaveSimetrica = new SecretKeySpec(decryptedText, 0, decryptedText.length, "AES");
+			seguranca.setChaveSimetrica(new SecretKeySpec(decryptedText, 0, decryptedText.length, "AES"));
 			System.out.println("Chave simetrica do destinatario recebida com sucesso!");
+			return seguranca.getChaveSimetrica();
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		
+		return null;		
+		
 	}
 
 }

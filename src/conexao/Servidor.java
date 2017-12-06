@@ -47,23 +47,21 @@ public class Servidor {
 	}
 	
 	public void start() {
-		System.out.println("Aguardando o cliente...");
+		System.out.println("Aguardando o cliente...");	
 		
 		if(!Arquivos.isChavePublica()) {
 			seguranca.gerarChaves();
 			seguranca.salvarChavePublica();
+			seguranca.salvarChavePrivada();
 		}
-			
 		
 		
 		while(true) {
 			try {
 				socket = serverSocket.accept();				
 				System.out.println("Cliente conectado");
-//				seguranca.setSocket(socket);
-//				sessao.setChaeSer(seguranca.receberChaveSimetrica();
 				
-				executor.execute(new ServidorThread(socket, contador, this));
+				executor.execute(new ServidorThread(socket, contador, this, seguranca));
 				contador++;
 				
 			} catch (IOException e) {				
