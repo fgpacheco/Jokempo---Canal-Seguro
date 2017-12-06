@@ -116,18 +116,22 @@ public class Seguranca {
 		KeyGenerator keyGenerator1 = KeyGenerator.getInstance("AES");
 		keyGenerator1.init(256, new SecureRandom());
 		sessao.setChaveEncriptacaoServer(keyGenerator1.generateKey());
-
+		System.out.println("ENC SERVER: "+sessao.getChaveEncriptacaoServer());
+		
 		KeyGenerator keyGenerator2 = KeyGenerator.getInstance("AES");
 		keyGenerator2.init(256, new SecureRandom());
 		sessao.setChaveEncriptacaoClient(keyGenerator2.generateKey());
+		System.out.println("ENC CLIENT: "+sessao.getChaveEncriptacaoClient());
 		
 		KeyGenerator keyGenerator3 = KeyGenerator.getInstance("AES");
 		keyGenerator3.init(256, new SecureRandom());
 		sessao.setChaveAutenticacaoServer(keyGenerator3.generateKey());
+		System.out.println("AUT SERVER: "+sessao.getChaveAutenticacaoServer());
 		
 		KeyGenerator keyGenerator4 = KeyGenerator.getInstance("AES");
 		keyGenerator4.init(256, new SecureRandom());
 		sessao.setChaveAutenticacaoClient(keyGenerator4.generateKey());
+		System.out.println("AUT CLIENT: "+sessao.getChaveAutenticacaoClient());
 	}
 
 	public PrivateKey getChavePrivada() {

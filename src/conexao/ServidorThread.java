@@ -43,6 +43,9 @@ public class ServidorThread implements Runnable{
 			
 			seguranca.setSessao(new Sessao());
 			System.out.println(comunicacao.receberChaveSimetrica());
+			System.out.println(comunicacao.receberChaveSimetrica());
+			System.out.println(comunicacao.receberChaveSimetrica());
+			System.out.println(comunicacao.receberChaveSimetrica());
 			//seguranca.getSessao().setChaveEncriptacaoClient(comunicacao.receberChaveSimetrica());
 			//seguranca.getSessao().setChaveEncriptacaoServer(comunicacao.receberChaveSimetrica());
 			//seguranca.getSessao().setChaveAutenticacaoClient(comunicacao.receberChaveSimetrica());

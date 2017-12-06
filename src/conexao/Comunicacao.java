@@ -33,12 +33,14 @@ public class Comunicacao {
 			byte[] ciphertext = seguranca.criptografa(seguranca.getSessao().getChaveEncriptacaoClient().getEncoded(), seguranca.getChavePublicaDestinatario());			
 			output.writeObject(Conversor.byteArrayToString(ciphertext));
 	
-			/*byte[] ciphertext1 = seguranca.criptografa(seguranca.getSessao().getChaveEncriptacaoServer().getEncoded(), seguranca.getChavePublicaDestinatario());			
+			byte[] ciphertext1 = seguranca.criptografa(seguranca.getSessao().getChaveEncriptacaoServer().getEncoded(), seguranca.getChavePublicaDestinatario());			
 			output.writeObject(Conversor.byteArrayToString(ciphertext1));
+			
 			byte[] ciphertext2 = seguranca.criptografa(seguranca.getSessao().getChaveAutenticacaoClient().getEncoded(), seguranca.getChavePublicaDestinatario());			
 			output.writeObject(Conversor.byteArrayToString(ciphertext2));
+			
 			byte[] ciphertext3 = seguranca.criptografa(seguranca.getSessao().getChaveAutenticacaoServer().getEncoded(), seguranca.getChavePublicaDestinatario());			
-			output.writeObject(Conversor.byteArrayToString(ciphertext3));*/
+			output.writeObject(Conversor.byteArrayToString(ciphertext3));
 			
 		} catch (IOException e) {
 			e.printStackTrace();
