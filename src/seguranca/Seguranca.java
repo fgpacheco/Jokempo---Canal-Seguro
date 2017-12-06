@@ -67,8 +67,10 @@ public class Seguranca {
 		System.out.println("Chave pública lida com sucesso no cliente!");				
 	}
 	
-	
-		
+	public void chavePrivada() {		
+		chavePrivada = (PrivateKey) Arquivos.lerObjetoPrivada();
+		System.out.println("Chave privada lida com sucesso no cliente!");				
+	}
 	
 	/**
 	 * Criptografa o texto puro usando a chave p�blica.
@@ -114,7 +116,7 @@ public class Seguranca {
 		KeyGenerator keyGenerator1 = KeyGenerator.getInstance("AES");
 		keyGenerator1.init(256, new SecureRandom());
 		sessao.setChaveEncriptacaoServer(keyGenerator1.generateKey());
-		
+
 		KeyGenerator keyGenerator2 = KeyGenerator.getInstance("AES");
 		keyGenerator2.init(256, new SecureRandom());
 		sessao.setChaveEncriptacaoClient(keyGenerator2.generateKey());
@@ -187,5 +189,4 @@ public class Seguranca {
 	}
 }*/
 	
-
 }

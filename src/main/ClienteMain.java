@@ -1,12 +1,11 @@
 package main;
 
-import java.io.IOException;
 import java.util.Scanner;
+
 import conexao.Cliente;
 import conexao.Servidor;
 import jogo.Jogador;
 import jogo.Partida;
-import utils.Conversor;
 
 public class ClienteMain {
 	
@@ -35,19 +34,18 @@ public class ClienteMain {
 		
 		//String resposta = null;
 		Jogador vencedor = null;
-		
-		try {
-			while(vencedor == null) {
-				vencedor = c.receber();								
-			}
-		} catch (IOException e) {			
-			e.printStackTrace();
-		} catch (ClassNotFoundException e) {			
-			e.printStackTrace();
+
+		while(vencedor == null) {
+			try {
+				vencedor = c.receber();
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}								
 		}
-		
+
 		//jogador = (Jogador) Conversor.convertFromString(resposta);
-		
+
 		String resultado = (vencedor == null) ? "Empate" : vencedor.getNome() + " venceu: " + vencedor.getEscolha();
 		
 		System.out.println(resultado);

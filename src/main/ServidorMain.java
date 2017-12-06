@@ -1,7 +1,6 @@
 package main;
 
 import conexao.Servidor;
-import jogo.Jogador;
 
 public class ServidorMain {
 	
