@@ -24,7 +24,7 @@ public class Cliente {
 	private ObjectInputStream in;
 	private ObjectOutputStream out;
 
-	//Segurança
+	//Seguranï¿½a
 	private Seguranca seguranca;	
 	
 	private Comunicacao comunicacao;
@@ -63,8 +63,8 @@ public class Cliente {
 			comunicacao =  new Comunicacao(socket, seguranca);
 			comunicacao.enviarChaveSimetrica();
 
-			out = new ObjectOutputStream(socket.getOutputStream());
-			in = new ObjectInputStream(socket.getInputStream());
+			//out = new ObjectOutputStream(socket.getOutputStream());
+			//in = new ObjectInputStream(socket.getInputStream());
 					
 
 		} catch (IOException ex) {
@@ -75,17 +75,11 @@ public class Cliente {
 	}
 
 	public void enviar(Jogador j) {
-		//out.println(msg);
-		try {
-			out.writeObject(j);
-		} catch (IOException e) {			
-			e.printStackTrace();
-		}
+		comunicacao.enviarObjeto(j);
 	}
 
-	public Jogador receber() throws IOException, ClassNotFoundException {
-		return (Jogador) in.readObject();
-		//return in.readLine();
+	public Jogador receber() {
+		return (Jogador) comunicacao.receberObjeto();		
 	}
 
 }

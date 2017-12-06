@@ -71,5 +71,10 @@ public class Conversor {
 		String str = Base64.encode(bs);		
 		return str;
 	}
+	
+	public static  byte[] stringToByteArray(String str) {
+		byte[] bs = Base64.decode(str);
+		return bs;		
+	}
 
 }

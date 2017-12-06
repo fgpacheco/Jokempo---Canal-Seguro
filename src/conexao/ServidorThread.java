@@ -37,19 +37,20 @@ public class ServidorThread implements Runnable{
 		ObjectInputStream in;
 		ObjectOutputStream out;
 
-		try {
-			in = new ObjectInputStream(socket.getInputStream());
-			out = new ObjectOutputStream(socket.getOutputStream());
+		try {			
+			//out = new ObjectOutputStream(socket.getOutputStream());
+			//in = new ObjectInputStream(socket.getInputStream());
 			
 			seguranca.setSessao(new Sessao());
-			seguranca.getSessao().setChaveEncriptacaoClient(comunicacao.receberChaveSimetrica());
-			seguranca.getSessao().setChaveEncriptacaoServer(comunicacao.receberChaveSimetrica());
-			seguranca.getSessao().setChaveAutenticacaoClient(comunicacao.receberChaveSimetrica());
-			seguranca.getSessao().setChaveAutenticacaoServer(comunicacao.receberChaveSimetrica());			
+			System.out.println(comunicacao.receberChaveSimetrica());
+			//seguranca.getSessao().setChaveEncriptacaoClient(comunicacao.receberChaveSimetrica());
+			//seguranca.getSessao().setChaveEncriptacaoServer(comunicacao.receberChaveSimetrica());
+			//seguranca.getSessao().setChaveAutenticacaoClient(comunicacao.receberChaveSimetrica());
+			//seguranca.getSessao().setChaveAutenticacaoServer(comunicacao.receberChaveSimetrica());
 			
 
 			//String msg = null;
-			Jogador jogador = (Jogador) in.readObject();
+			Jogador jogador = (Jogador) comunicacao.receberObjeto();//.readObject();			
 			
 			while(jogador != null) {				
 				//jogador = (Jogador) Conversor.convertFromString(msg);
@@ -70,15 +71,13 @@ public class ServidorThread implements Runnable{
 					jogador = servidor.resultado();
 					//msg = Conversor.convertToString(jogador);
 					//out.println(msg);
-					out.writeObject(jogador);
+					//out.writeObject(jogador);
+					comunicacao.enviarObjeto(jogador);
 				}
 				
-				jogador = (Jogador) in.readObject();
+				jogador = (Jogador) comunicacao.receberObjeto();//.readObject();
 			}
-			
-
-		} catch (IOException e) {			
-			e.printStackTrace();
+		
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
