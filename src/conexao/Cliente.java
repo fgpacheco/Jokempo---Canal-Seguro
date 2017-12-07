@@ -75,11 +75,18 @@ public class Cliente {
 	}
 
 	public void enviar(Jogador j) {
-		comunicacao.enviarObjeto(j);
+		//j.setAuth(seguranca.getSessao().getChaveAutenticacaoClient());
+		comunicacao.enviarObjeto(j, true);
 	}
 
 	public Jogador receber() {
-		return (Jogador) comunicacao.receberObjeto();		
+				
+		if(seguranca.getSessao().getChaveAutenticacaoServer().equals(comunicacao.receberKeyAuth())) {
+			return (Jogador) comunicacao.receberObjeto(false);
+		} 
+		
+		return null;
+				
 	}
 
 }

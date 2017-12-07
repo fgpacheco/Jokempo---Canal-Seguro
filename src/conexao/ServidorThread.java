@@ -40,47 +40,58 @@ public class ServidorThread implements Runnable{
 		try {			
 			//out = new ObjectOutputStream(socket.getOutputStream());
 			//in = new ObjectInputStream(socket.getInputStream());
-			
+
 			seguranca.setSessao(new Sessao());
+			/*System.out.println(comunicacao.receberChaveSimetrica());
 			System.out.println(comunicacao.receberChaveSimetrica());
 			System.out.println(comunicacao.receberChaveSimetrica());
-			System.out.println(comunicacao.receberChaveSimetrica());
-			System.out.println(comunicacao.receberChaveSimetrica());
-			//seguranca.getSessao().setChaveEncriptacaoClient(comunicacao.receberChaveSimetrica());
-			//seguranca.getSessao().setChaveEncriptacaoServer(comunicacao.receberChaveSimetrica());
-			//seguranca.getSessao().setChaveAutenticacaoClient(comunicacao.receberChaveSimetrica());
-			//seguranca.getSessao().setChaveAutenticacaoServer(comunicacao.receberChaveSimetrica());
-			
+			System.out.println(comunicacao.receberChaveSimetrica());*/
+
+			seguranca.getSessao().setChaveEncriptacaoClient(comunicacao.receberChaveSimetrica());
+			seguranca.getSessao().setChaveEncriptacaoServer(comunicacao.receberChaveSimetrica());
+			seguranca.getSessao().setChaveAutenticacaoClient(comunicacao.receberChaveSimetrica());
+			seguranca.getSessao().setChaveAutenticacaoServer(comunicacao.receberChaveSimetrica());
+
 
 			//String msg = null;
-			Jogador jogador = (Jogador) comunicacao.receberObjeto();//.readObject();			
 			
-			while(jogador != null) {				
-				//jogador = (Jogador) Conversor.convertFromString(msg);
-				System.out.println(jogador.getNome());
-			
-				
-				synchronized (this.servidor) {					
-					servidor.getPartida().add(jogador);
+			if(seguranca.getSessao().getChaveAutenticacaoClient().equals(comunicacao.receberKeyAuth())) {
+				System.out.println("Mensagem autenticado");
+				Jogador jogador = (Jogador) comunicacao.receberObjeto(true);//.readObject();
 
-					if(servidor.getPartida().getJogadores().size() == 2) {					
-						//this.servidor.trava.notifyAll();
-						this.servidor.notifyAll();
-					} else {					
-						//this.servidor.trava.wait();
-						this.servidor.wait();
+				while(jogador != null) {				
+					//jogador = (Jogador) Conversor.convertFromString(msg);
+					System.out.println(jogador.getNome());
+
+					synchronized (this.servidor) {					
+						servidor.getPartida().add(jogador);
+
+						if(servidor.getPartida().getJogadores().size() == 2) {					
+							//this.servidor.trava.notifyAll();
+							this.servidor.notifyAll();
+						} else {					
+							//this.servidor.trava.wait();
+							this.servidor.wait();
+						}
+
+						Jogador vencedor = servidor.resultado();
+						comunicacao.enviarObjeto(vencedor, false);
+						//msg = Conversor.convertToString(jogador);
+						//out.println(msg);
+						//out.writeObject(jogador);
+						
 					}
-					
-					jogador = servidor.resultado();
-					//msg = Conversor.convertToString(jogador);
-					//out.println(msg);
-					//out.writeObject(jogador);
-					comunicacao.enviarObjeto(jogador);
+
+					jogador = (Jogador) comunicacao.receberObjeto(true);//.readObject();
 				}
-				
-				jogador = (Jogador) comunicacao.receberObjeto();//.readObject();
+
+			} else {
+				System.out.println("Mensagem não autenticado");
+				return;
 			}
-		
+
+
+
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

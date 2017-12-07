@@ -13,6 +13,16 @@ import javax.crypto.Cipher;
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
 
+import org.bouncycastle.crypto.DataLengthException;
+import org.bouncycastle.crypto.InvalidCipherTextException;
+import org.bouncycastle.crypto.engines.AESEngine;
+import org.bouncycastle.crypto.modes.CBCBlockCipher;
+import org.bouncycastle.crypto.paddings.BlockCipherPadding;
+import org.bouncycastle.crypto.paddings.PKCS7Padding;
+import org.bouncycastle.crypto.paddings.PaddedBufferedBlockCipher;
+import org.bouncycastle.crypto.params.KeyParameter;
+import org.bouncycastle.crypto.params.ParametersWithIV;
+
 import utils.Arquivos;
 
 public class Seguranca {
@@ -99,7 +109,6 @@ public class Seguranca {
 		byte[] dectyptedText = null;
 		try {
 			Cipher cipher = Cipher.getInstance("RSA");
-
 			// Decriptografa o texto puro usando a chave Privada
 			cipher.init(Cipher.DECRYPT_MODE, chave);
 			dectyptedText = cipher.doFinal(texto);
@@ -108,6 +117,91 @@ public class Seguranca {
 		}
 
 		return dectyptedText;
+	}
+	
+    public byte[] criptografaSimetrica(byte[] data, SecretKey secret) {
+        try {
+            return process(data, true, secret);
+        } catch (Exception ex) {
+        	ex.printStackTrace();
+        }
+        return null;
+    }
+
+    public byte[] decriptografiaSimetrica(byte[] data, SecretKey secret) {
+        try {
+            return process(data, false, secret);
+        } catch (Exception ex) {
+        	ex.printStackTrace();
+        }
+        return null;
+    }
+	
+	private byte[] process(byte[] input, boolean encrypt, SecretKey secret) throws DataLengthException, IllegalStateException, InvalidCipherTextException {
+        CBCBlockCipher cbcBlockCipher = new CBCBlockCipher(new AESEngine());
+        BlockCipherPadding bcp = new PKCS7Padding();
+        PaddedBufferedBlockCipher pbbc = new PaddedBufferedBlockCipher(cbcBlockCipher, bcp);
+
+        int blockSize = cbcBlockCipher.getBlockSize();
+        int inputOffset = 0;
+        int inputLength = input.length;
+        int outputOffset = 0;
+
+        byte[] iv = new byte[blockSize];
+        if (encrypt) {
+            //random.nextBytes(iv);
+            outputOffset += blockSize;
+        } else {
+            System.arraycopy(input, 0, iv, 0, blockSize);
+            inputOffset += blockSize;
+            inputLength -= blockSize;
+        }
+
+        pbbc.init(encrypt, new ParametersWithIV(new KeyParameter(secret.getEncoded()), iv));
+        byte[] output = new byte[pbbc.getOutputSize(inputLength) + outputOffset];
+
+        if (encrypt) {
+            System.arraycopy(iv, 0, output, 0, blockSize);
+        }
+
+        int outputLength = outputOffset + pbbc.processBytes(input, inputOffset, inputLength, output, outputOffset);
+
+        outputLength += pbbc.doFinal(output, outputLength);
+
+        byte[] out = new byte[outputLength];
+        System.arraycopy(output, 0, out, 0, outputLength);
+
+        return out;
+    }
+	
+	public byte[] autenticacao(byte[] input, SecretKey secret) throws DataLengthException, InvalidCipherTextException {
+		CBCBlockCipher cbcBlockCipher = new CBCBlockCipher(new AESEngine());
+		//SecureRandom random = new SecureRandom();
+		BlockCipherPadding bcp = new PKCS7Padding();
+		PaddedBufferedBlockCipher pbbc = new PaddedBufferedBlockCipher(cbcBlockCipher, bcp);
+
+		int blockSize = cbcBlockCipher.getBlockSize();
+		int inputOffset = 0;
+		int inputLength = input.length;
+		int outputOffset = 0;
+
+		byte[] iv = new byte[blockSize];
+		outputOffset += blockSize;
+
+		pbbc.init(true, new ParametersWithIV(new KeyParameter(secret.getEncoded()), iv));
+		byte[] output = new byte[pbbc.getOutputSize(inputLength) + outputOffset];
+
+		System.arraycopy(iv, 0, output, 0, blockSize);
+
+		int outputLength = outputOffset + pbbc.processBytes(input, inputOffset, inputLength, output, outputOffset);
+
+		outputLength += pbbc.doFinal(output, outputLength);
+
+		//Pego apenas o último bloco
+		byte[] out = new byte[blockSize];
+		System.arraycopy(output, outputLength - blockSize, out, 0, blockSize);
+
+		return out;
 	}
 	
 	public void criarChaveSessao() throws NoSuchAlgorithmException{
