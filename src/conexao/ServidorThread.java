@@ -1,31 +1,17 @@
 package conexao;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.io.PrintWriter;
 import java.net.Socket;
-import java.util.ArrayList;
-
-import com.sun.prism.paint.Stop;
-
 import jogo.Jogador;
 import seguranca.Seguranca;
-import seguranca.Sessao;
-import utils.Conversor;
 
 public class ServidorThread implements Runnable{
 
-	private Socket socket;
 	private int contador;	
 	private Servidor servidor;
 	private Seguranca seguranca;
 	private Comunicacao comunicacao;
 
 	public ServidorThread(Socket socket, int contador, Servidor servidor, Seguranca seguranca) {
-		this.socket = socket;
 		this.contador = contador;
 		this.servidor = servidor;
 		this.seguranca = seguranca;
@@ -34,29 +20,15 @@ public class ServidorThread implements Runnable{
 
 	@Override
 	public void run() {
-		ObjectInputStream in;
-		ObjectOutputStream out;
+		try {
 
-		try {			
-			//out = new ObjectOutputStream(socket.getOutputStream());
-			//in = new ObjectInputStream(socket.getInputStream());
-			
-			seguranca.setSessao(new Sessao());
-			System.out.println(comunicacao.receberChaveSimetrica());
-			//seguranca.getSessao().setChaveEncriptacaoClient(comunicacao.receberChaveSimetrica());
-			//seguranca.getSessao().setChaveEncriptacaoServer(comunicacao.receberChaveSimetrica());
-			//seguranca.getSessao().setChaveAutenticacaoClient(comunicacao.receberChaveSimetrica());
-			//seguranca.getSessao().setChaveAutenticacaoServer(comunicacao.receberChaveSimetrica());
-			
+			seguranca.setSessao(comunicacao.receberSessao());
 
-			//String msg = null;
-			Jogador jogador = (Jogador) comunicacao.receberObjeto();//.readObject();			
-			
-			while(jogador != null) {				
-				//jogador = (Jogador) Conversor.convertFromString(msg);
+			Jogador jogador = (Jogador) comunicacao.receberObjetoCliente();
+
+			while(jogador != null) {
 				System.out.println(jogador.getNome());
-			
-				
+
 				synchronized (this.servidor) {					
 					servidor.getPartida().add(jogador);
 
@@ -67,17 +39,15 @@ public class ServidorThread implements Runnable{
 						//this.servidor.trava.wait();
 						this.servidor.wait();
 					}
-					
-					jogador = servidor.resultado();
-					//msg = Conversor.convertToString(jogador);
-					//out.println(msg);
-					//out.writeObject(jogador);
-					comunicacao.enviarObjeto(jogador);
+
+					Jogador vencedor = servidor.resultado();
+					comunicacao.enviarObjetoServidor(vencedor);
 				}
-				
-				jogador = (Jogador) comunicacao.receberObjeto();//.readObject();
+
+				jogador = (Jogador) comunicacao.receberObjetoCliente();
 			}
-		
+
+
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

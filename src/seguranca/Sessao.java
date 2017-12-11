@@ -12,14 +12,14 @@ public class Sessao {
 	public Sessao(){
 		
 	}
-	
+
 	public Sessao(SecretKey keyS, SecretKey keyC, SecretKey autKeyS, SecretKey autKeyC){
 		chaveEncriptacaoServer = keyS;
 		chaveEncriptacaoClient = keyC;
 		chaveAutenticacaoServer = autKeyS;
 		chaveAutenticacaoClient = autKeyC;
 	}
-	
+
 	public SecretKey getChaveEncriptacaoServer() {
 		return chaveEncriptacaoServer;
 	}
@@ -44,4 +44,6 @@ public class Sessao {
 	public void setChaveAutenticacaoClient(SecretKey chaveAutenticacaoClient) {
 		this.chaveAutenticacaoClient = chaveAutenticacaoClient;
 	}
+
 }
+

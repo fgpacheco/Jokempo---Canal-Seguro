@@ -4,11 +4,18 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
+import java.util.Arrays;
 
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 
+import org.bouncycastle.crypto.DataLengthException;
+import org.bouncycastle.crypto.InvalidCipherTextException;
+
+import jogo.Jogador;
+import jogo.JogadorSent;
 import seguranca.Seguranca;
+import seguranca.Sessao;
 import utils.Conversor;
 
 public class Comunicacao {
@@ -21,64 +28,132 @@ public class Comunicacao {
 		try {
 			this.socket = socket;
 			this.seguranca = seguranca;			
-			output = new ObjectOutputStream(socket.getOutputStream());
-			input = new ObjectInputStream(socket.getInputStream());
+			output = new ObjectOutputStream(this.socket.getOutputStream());
+			input = new ObjectInputStream(this.socket.getInputStream());
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 	}
 	
-	public void enviarChaveSimetrica() {
+	public void enviarSessao() {
 		try {
-			System.out.println(seguranca.getSessao().getChaveEncriptacaoClient().getEncoded());
-			System.out.println(seguranca.getChavePublicaDestinatario());
 			byte[] ciphertext = seguranca.criptografa(seguranca.getSessao().getChaveEncriptacaoClient().getEncoded(), seguranca.getChavePublicaDestinatario());			
 			output.writeObject(Conversor.byteArrayToString(ciphertext));
-			/*byte[] ciphertext1 = seguranca.criptografa(seguranca.getSessao().getChaveEncriptacaoServer().getEncoded(), seguranca.getChavePublicaDestinatario());			
+	
+			byte[] ciphertext1 = seguranca.criptografa(seguranca.getSessao().getChaveEncriptacaoServer().getEncoded(), seguranca.getChavePublicaDestinatario());			
 			output.writeObject(Conversor.byteArrayToString(ciphertext1));
+			
 			byte[] ciphertext2 = seguranca.criptografa(seguranca.getSessao().getChaveAutenticacaoClient().getEncoded(), seguranca.getChavePublicaDestinatario());			
 			output.writeObject(Conversor.byteArrayToString(ciphertext2));
+			
 			byte[] ciphertext3 = seguranca.criptografa(seguranca.getSessao().getChaveAutenticacaoServer().getEncoded(), seguranca.getChavePublicaDestinatario());			
-			output.writeObject(Conversor.byteArrayToString(ciphertext3));*/
+			output.writeObject(Conversor.byteArrayToString(ciphertext3));
 			
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 	}
 	
-	public SecretKey receberChaveSimetrica() {
+	public Sessao receberSessao() {
+		Sessao s = new Sessao();
 		try {
-			byte[] ba = (byte[]) input.readObject();
-			//byte[] ba = Conversor.stringToByteArray((String) input.readObject());
-			byte[] decryptedText = seguranca.decriptografa(ba, seguranca.getChavePrivada());
+			
+			
+			String ba = (String) input.readObject();
+			byte [] ba1 = Conversor.stringToByteArray(ba);
+			byte[] decryptedText = seguranca.decriptografa(ba1, seguranca.getChavePrivada());
+			s.setChaveEncriptacaoClient(new SecretKeySpec(decryptedText, 0, decryptedText.length, "AES"));
+			
+			
+			ba = (String) input.readObject();
+			ba1 = Conversor.stringToByteArray(ba);
+			decryptedText = seguranca.decriptografa(ba1, seguranca.getChavePrivada());
+			s.setChaveEncriptacaoServer(new SecretKeySpec(decryptedText, 0, decryptedText.length, "AES"));
+			
+			ba = (String) input.readObject();
+			ba1 = Conversor.stringToByteArray(ba);
+			decryptedText = seguranca.decriptografa(ba1, seguranca.getChavePrivada());
+			s.setChaveAutenticacaoClient(new SecretKeySpec(decryptedText, 0, decryptedText.length, "AES"));
+			
+			
+			ba = (String) input.readObject();
+			ba1 = Conversor.stringToByteArray(ba);
+			decryptedText = seguranca.decriptografa(ba1, seguranca.getChavePrivada());
+			s.setChaveAutenticacaoServer(new SecretKeySpec(decryptedText, 0, decryptedText.length, "AES"));
+			
 
-			seguranca.setChaveSimetrica(new SecretKeySpec(decryptedText, 0, decryptedText.length, "AES"));
 			System.out.println("Chave simetrica do destinatario recebida com sucesso!");
-			return seguranca.getChaveSimetrica();
+			
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
-		return null;		
-		
+		return s;
 	}
 	
-	public void enviarObjeto(Object obj) {
+	public void enviarObjetoCliente(Object obj) {
+		enviarObjeto(obj, seguranca.getSessao().getChaveAutenticacaoClient(),  seguranca.getSessao().getChaveEncriptacaoClient());		
+	}
+	
+	public void enviarObjetoServidor(Object obj) {
+		enviarObjeto(obj, seguranca.getSessao().getChaveAutenticacaoServer(),  seguranca.getSessao().getChaveEncriptacaoServer());		
+	}
+	
+	public void enviarObjeto(Object obj, SecretKey autenticacao, SecretKey encriptacao) {
 		try {
-			output.writeObject(obj);
+			byte[] b = Conversor.convertToByteArray(obj);			
+
+			byte[] auth = seguranca.autenticacao(b, autenticacao);
+			byte[] encrypt = seguranca.criptografaSimetrica(b, encriptacao);
+			
+			JogadorSent js = new JogadorSent(auth, encrypt);
+			
+			output.writeObject(Conversor.convertToString(js));
+			
 		} catch (IOException e) {			
 			e.printStackTrace();
-		}		
+		} catch (DataLengthException e) {			
+			e.printStackTrace();
+		} catch (InvalidCipherTextException e) {			
+			e.printStackTrace();
+		} 		
 	}
 	
-	public Object receberObjeto() {
+	public Object receberObjetoCliente() {
+		return receberObjeto(seguranca.getSessao().getChaveAutenticacaoClient(), seguranca.getSessao().getChaveEncriptacaoClient());
+	}
+	
+	public Object receberObjetoServidor() {
+		return receberObjeto(seguranca.getSessao().getChaveAutenticacaoServer(), seguranca.getSessao().getChaveEncriptacaoServer());
+	}
+	
+	public Object receberObjeto(SecretKey autenticacao, SecretKey encriptacao) {
 		try {
-			return input.readObject();
+			String str = (String) input.readObject();
+			JogadorSent js = (JogadorSent) Conversor.convertFromString(str);			
+			byte[] decrypt = seguranca.decriptografiaSimetrica(js.getEncriptacao(), encriptacao);
+			
+			Jogador j = (Jogador) Conversor.convertFromByteArray(decrypt);
+			byte[] byteJogador = Conversor.convertToByteArray(j);
+			
+			byte[] auth = seguranca.autenticacao(byteJogador, autenticacao);
+			
+			if(Arrays.equals(auth, js.getAutenticacao())) {
+				System.out.println("Autenticado.");
+				return j;
+			} else {
+				System.out.println("Autenticação Falhou");
+			}
+
 		} catch (ClassNotFoundException | IOException e) {		
 			e.printStackTrace();
+		} catch (DataLengthException e) {			
+			e.printStackTrace();
+		} catch (InvalidCipherTextException e) {			
+			e.printStackTrace();
 		}
+		
 		return null;
 	}
-
+	
 }

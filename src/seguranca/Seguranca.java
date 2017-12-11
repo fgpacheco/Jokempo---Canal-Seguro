@@ -1,10 +1,5 @@
 package seguranca;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.net.Socket;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.NoSuchAlgorithmException;
@@ -17,18 +12,23 @@ import java.security.Security;
 import javax.crypto.Cipher;
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
-import javax.crypto.spec.SecretKeySpec;
+
+import org.bouncycastle.crypto.DataLengthException;
+import org.bouncycastle.crypto.InvalidCipherTextException;
+import org.bouncycastle.crypto.engines.AESEngine;
+import org.bouncycastle.crypto.modes.CBCBlockCipher;
+import org.bouncycastle.crypto.paddings.BlockCipherPadding;
+import org.bouncycastle.crypto.paddings.PKCS7Padding;
+import org.bouncycastle.crypto.paddings.PaddedBufferedBlockCipher;
+import org.bouncycastle.crypto.params.KeyParameter;
+import org.bouncycastle.crypto.params.ParametersWithIV;
 
 import utils.Arquivos;
 
 public class Seguranca {
-	
-	private KeyPairGenerator assimetrica;
 	private PrivateKey chavePrivada;
 	private PublicKey chavePublica;
 	private PublicKey chavePublicaDestinatario;
-	private SecretKey chaveSimetrica;
-	
 	private Sessao sessao;  
 	
 	public Seguranca(){
@@ -42,6 +42,7 @@ public class Seguranca {
 	
 	private void gerarChaveAssimetrica() {
 		Security.addProvider(new org.bouncycastle.jce.provider.BouncyCastleProvider());
+		KeyPairGenerator assimetrica = null;
 
 		try {
 			assimetrica = KeyPairGenerator.getInstance("RSA", "BC");
@@ -60,7 +61,7 @@ public class Seguranca {
 	
 	public void salvarChavePublica() {
 		Arquivos.gravarObjeto(chavePublica, "publica");
-		System.out.println("Chave pÃºblica armazenada!");
+		System.out.println("Chave pública armazenada!");
 	}
 	
 	public void salvarChavePrivada() {
@@ -70,14 +71,16 @@ public class Seguranca {
 	
 	public void obterPublicaDestinatario() {		
 		chavePublicaDestinatario = (PublicKey) Arquivos.lerObjeto();
-		System.out.println("Chave pÃºblica lida com sucesso no cliente!");				
+		System.out.println("Chave pública lida com sucesso no cliente!");				
 	}
 	
-	
-		
+	public void chavePrivada() {		
+		chavePrivada = (PrivateKey) Arquivos.lerObjetoPrivada();
+		System.out.println("Chave privada lida com sucesso!");				
+	}
 	
 	/**
-	 * Criptografa o texto puro usando a chave pï¿½blica.
+	 * Criptografa o texto puro usando a chave pública.
 	 */
 	public byte[] criptografa(byte[] texto, PublicKey chave) {
 		byte[] cipherText = null;
@@ -103,7 +106,6 @@ public class Seguranca {
 		byte[] dectyptedText = null;
 		try {
 			Cipher cipher = Cipher.getInstance("RSA");
-
 			// Decriptografa o texto puro usando a chave Privada
 			cipher.init(Cipher.DECRYPT_MODE, chave);
 			dectyptedText = cipher.doFinal(texto);
@@ -114,24 +116,107 @@ public class Seguranca {
 		return dectyptedText;
 	}
 	
+    public byte[] criptografaSimetrica(byte[] data, SecretKey secret) {
+        try {
+            return process(data, true, secret);
+        } catch (Exception ex) {
+        	ex.printStackTrace();
+        }
+        return null;
+    }
+
+    public byte[] decriptografiaSimetrica(byte[] data, SecretKey secret) {
+        try {
+            return process(data, false, secret);
+        } catch (Exception ex) {
+        	ex.printStackTrace();
+        }
+        return null;
+    }
+	
+	private byte[] process(byte[] input, boolean encrypt, SecretKey secret) throws DataLengthException, IllegalStateException, InvalidCipherTextException {
+        CBCBlockCipher cbcBlockCipher = new CBCBlockCipher(new AESEngine());
+        BlockCipherPadding bcp = new PKCS7Padding();
+        PaddedBufferedBlockCipher pbbc = new PaddedBufferedBlockCipher(cbcBlockCipher, bcp);
+
+        int blockSize = cbcBlockCipher.getBlockSize();
+        int inputOffset = 0;
+        int inputLength = input.length;
+        int outputOffset = 0;
+
+        byte[] iv = new byte[blockSize];
+        if (encrypt) {
+            //random.nextBytes(iv);
+            outputOffset += blockSize;
+        } else {
+            System.arraycopy(input, 0, iv, 0, blockSize);
+            inputOffset += blockSize;
+            inputLength -= blockSize;
+        }
+
+        pbbc.init(encrypt, new ParametersWithIV(new KeyParameter(secret.getEncoded()), iv));
+        byte[] output = new byte[pbbc.getOutputSize(inputLength) + outputOffset];
+
+        if (encrypt) {
+            System.arraycopy(iv, 0, output, 0, blockSize);
+        }
+
+        int outputLength = outputOffset + pbbc.processBytes(input, inputOffset, inputLength, output, outputOffset);
+
+        outputLength += pbbc.doFinal(output, outputLength);
+
+        byte[] out = new byte[outputLength];
+        System.arraycopy(output, 0, out, 0, outputLength);
+
+        return out;
+    }
+	
+	public byte[] autenticacao(byte[] input, SecretKey secret) throws DataLengthException, InvalidCipherTextException {
+		CBCBlockCipher cbcBlockCipher = new CBCBlockCipher(new AESEngine());
+		//SecureRandom random = new SecureRandom();
+		BlockCipherPadding bcp = new PKCS7Padding();
+		PaddedBufferedBlockCipher pbbc = new PaddedBufferedBlockCipher(cbcBlockCipher, bcp);
+
+		int blockSize = cbcBlockCipher.getBlockSize();
+		int inputOffset = 0;
+		int inputLength = input.length;
+		int outputOffset = 0;
+
+		byte[] iv = new byte[blockSize];
+		outputOffset += blockSize;
+
+		pbbc.init(true, new ParametersWithIV(new KeyParameter(secret.getEncoded()), iv));
+		byte[] output = new byte[pbbc.getOutputSize(inputLength) + outputOffset];
+
+		System.arraycopy(iv, 0, output, 0, blockSize);
+
+		int outputLength = outputOffset + pbbc.processBytes(input, inputOffset, inputLength, output, outputOffset);
+
+		outputLength += pbbc.doFinal(output, outputLength);
+
+		//Pego apenas o Ãºltimo bloco
+		byte[] out = new byte[blockSize];
+		System.arraycopy(output, outputLength - blockSize, out, 0, blockSize);
+
+		return out;
+	}
+	
 	public void criarChaveSessao() throws NoSuchAlgorithmException{
 		sessao = new Sessao();
 		
 		KeyGenerator keyGenerator1 = KeyGenerator.getInstance("AES");
 		keyGenerator1.init(256, new SecureRandom());
 		sessao.setChaveEncriptacaoServer(keyGenerator1.generateKey());
+		System.out.println("ENC SERVER: "+sessao.getChaveEncriptacaoServer());
 		
-		KeyGenerator keyGenerator2 = KeyGenerator.getInstance("AES");
-		keyGenerator2.init(256, new SecureRandom());
-		sessao.setChaveEncriptacaoClient(keyGenerator2.generateKey());
+		sessao.setChaveEncriptacaoClient(keyGenerator1.generateKey());
+		System.out.println("ENC CLIENT: "+sessao.getChaveEncriptacaoClient());
 		
-		KeyGenerator keyGenerator3 = KeyGenerator.getInstance("AES");
-		keyGenerator3.init(256, new SecureRandom());
-		sessao.setChaveAutenticacaoServer(keyGenerator3.generateKey());
+		sessao.setChaveAutenticacaoServer(keyGenerator1.generateKey());
+		System.out.println("AUT SERVER: "+sessao.getChaveAutenticacaoServer());
 		
-		KeyGenerator keyGenerator4 = KeyGenerator.getInstance("AES");
-		keyGenerator4.init(256, new SecureRandom());
-		sessao.setChaveAutenticacaoClient(keyGenerator4.generateKey());
+		sessao.setChaveAutenticacaoClient(keyGenerator1.generateKey());
+		System.out.println("AUT CLIENT: "+sessao.getChaveAutenticacaoClient());
 	}
 
 	public PrivateKey getChavePrivada() {
@@ -140,14 +225,6 @@ public class Seguranca {
 
 	public void setChavePrivada(PrivateKey chavePrivada) {
 		this.chavePrivada = chavePrivada;
-	}
-
-	public KeyPairGenerator getAssimetrica() {
-		return assimetrica;
-	}
-
-	public void setAssimetrica(KeyPairGenerator assimetrica) {
-		this.assimetrica = assimetrica;
 	}
 
 	public PublicKey getChavePublica() {
@@ -166,14 +243,6 @@ public class Seguranca {
 		this.chavePublicaDestinatario = chavePublicaDestinatario;
 	}
 
-	public SecretKey getChaveSimetrica() {
-		return chaveSimetrica;
-	}
-
-	public void setChaveSimetrica(SecretKey chaveSimetrica) {
-		this.chaveSimetrica = chaveSimetrica;
-	}
-
 	public Sessao getSessao() {
 		return sessao;
 	}
@@ -181,18 +250,4 @@ public class Seguranca {
 	public void setSessao(Sessao sessao) {
 		this.sessao = sessao;
 	}
-	
-	
-	/*private void gerarChaveSimetrica() {
-	try {
-		KeyGenerator keygenerator = KeyGenerator.getInstance("AES");
-		chaveSimetrica = keygenerator.generateKey();
-
-		System.out.println("Chave simetrica criada com sucesso!");
-	} catch (NoSuchAlgorithmException e) {		
-		e.printStackTrace();
-	}
-}*/
-	
-
 }

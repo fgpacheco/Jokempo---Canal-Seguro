@@ -53,7 +53,9 @@ public class Servidor {
 			seguranca.gerarChaves();
 			seguranca.salvarChavePublica();
 			seguranca.salvarChavePrivada();
-		}
+		}else {
+			seguranca.chavePrivada();
+		}		
 		
 		
 		while(true) {
