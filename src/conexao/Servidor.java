@@ -3,11 +3,21 @@ package conexao;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.security.KeyPair;
+import java.security.KeyPairGenerator;
+import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
+import java.security.PrivateKey;
+import java.security.PublicKey;
+import java.security.SecureRandom;
+import java.security.Security;
 import java.util.ArrayList;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import jogo.Partida;
+import seguranca.Seguranca;
+import utils.Arquivos;
 import jogo.Jogador;
 
 public class Servidor {
@@ -18,6 +28,11 @@ public class Servidor {
 	private ExecutorService executor;
 	private int contador = 0;
 	private Partida partida;
+
+	//Seguran�a
+	private Seguranca seguranca;
+	
+	//Servir� como monitor
 	public Object trava = new Object();
 	
 	public Servidor() {
@@ -25,6 +40,8 @@ public class Servidor {
 			serverSocket = new ServerSocket(PORTA);
 			executor = Executors.newFixedThreadPool(2);		
 			partida = new Partida();
+//			seguranca = new Seguranca();
+
 		} catch (IOException e) {			
 			e.printStackTrace();
 		}
@@ -35,13 +52,18 @@ public class Servidor {
 		
 		while(true) {
 			try {
+				seguranca = new Seguranca();
+				if(!Arquivos.isChavePublica()) {
+					seguranca.gerarChaves();
+					seguranca.salvarChavePublica();
+					seguranca.salvarChavePrivada();
+				}else {
+					seguranca.chavePrivada();
+				}		
 				socket = serverSocket.accept();				
-				System.out.println("Cliente conectado");
-				
-				executor.execute(new ServidorThread(socket, contador, this));
-				contador++;				
-				
-				//new ServidorThread(socket).start();	
+				System.out.println("Cliente conectado");				
+				executor.execute(new ServidorThread(socket, contador, this, seguranca));
+				contador++;
 			} catch (IOException e) {				
 				e.printStackTrace();
 			}				
@@ -60,7 +82,5 @@ public class Servidor {
 		return partida.vencedor();	
 	}
 	
-	
-	
-
 }
+

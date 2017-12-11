@@ -1,44 +1,35 @@
 package conexao;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
 import java.net.Socket;
-import java.util.ArrayList;
-
-import com.sun.prism.paint.Stop;
-
 import jogo.Jogador;
+import seguranca.Seguranca;
 
 public class ServidorThread implements Runnable{
 
-	private Socket socket;
 	private int contador;	
 	private Servidor servidor;
+	private Seguranca seguranca;
+	private Comunicacao comunicacao;
 
-	public ServidorThread(Socket socket, int contador, Servidor servidor) {
-		this.socket = socket;
+	public ServidorThread(Socket socket, int contador, Servidor servidor, Seguranca seguranca) {
 		this.contador = contador;
 		this.servidor = servidor;
+		this.seguranca = seguranca;
+		this.comunicacao =  new Comunicacao(socket, seguranca);
+
 	}
 
 	@Override
 	public void run() {
-		BufferedReader in;
-		PrintWriter out;
-
 		try {
-			in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-			out = new PrintWriter(socket.getOutputStream(), true);
 
-			String msg = null;
-			Jogador jogador;
+			seguranca.setSessao(comunicacao.receberSessao());
+			Jogador jogador = (Jogador) comunicacao.receberObjetoCliente();
+			System.out.println(Thread.currentThread().getName());
 
-			while((msg = in.readLine()) != null) {				
-				jogador = Jogador.convertFromString(msg);
+			while(jogador != null) {
 				System.out.println(jogador.getNome());
-				
+        
 				synchronized (this.servidor) {					
 					servidor.getPartida().add(jogador);
 
@@ -49,23 +40,18 @@ public class ServidorThread implements Runnable{
 						//this.servidor.trava.wait();
 						this.servidor.wait();
 					}
-					
-					msg = servidor.resultado().getNome();
-					out.println(msg);				
-					
+					Jogador vencedor = servidor.resultado();
+					comunicacao.enviarObjetoServidor(vencedor);
 				}
-				//System.out.println(jogador.getNome());
-			}
-			
 
-		} catch (IOException e) {			
-			e.printStackTrace();
+				jogador = (Jogador) comunicacao.receberObjetoCliente();
+			}
+
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 
 	}
 
-
-
 }
+

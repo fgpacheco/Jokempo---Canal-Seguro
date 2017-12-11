@@ -21,7 +21,10 @@ public class Partida {
 		int escolhaJog1 = escolhaToInt(jogador1.getEscolha());
 		int escolhaJog2 = escolhaToInt(jogador2.getEscolha());
 		
-		if((escolhaJog1 - escolhaJog2 == -1) || (escolhaJog1 - escolhaJog2 == 2)) {
+
+		if((escolhaJog1 - escolhaJog2) == 0) {			
+			return null;		
+		} else if((escolhaJog1 - escolhaJog2 == -1) || (escolhaJog1 - escolhaJog2 == 2)) {
 			return jogador1;
 		} else {
 			return jogador2;
@@ -63,8 +66,11 @@ public class Partida {
 		}
 	}
 	
+
+	/*
 	public static void main(String[] args) {
-		Jogador jogador1 = new Jogador("Felipe", "Tesoura");
+		Jogador jogador1 = new Jogador("Felipe", "Pedra");
+
 		Jogador jogador2 = new Jogador("Samir", "Pedra");
 		
 		Partida partida = new Partida();
@@ -75,12 +81,10 @@ public class Partida {
 		for(Jogador j : partida.getJogadores()) {
 			System.out.println(j.getNome() + " " + j.getEscolha());
 		}
-		
 		 
-		
-		System.out.println(partida.vencedor().getNome());
-		
-		
+		Jogador v = partida.vencedor();
+		System.out.println(v == null ? "Empate" : v.getNome());
 	}
+	*/
 
 }
