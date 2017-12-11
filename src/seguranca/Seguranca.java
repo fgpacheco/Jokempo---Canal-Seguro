@@ -26,13 +26,9 @@ import org.bouncycastle.crypto.params.ParametersWithIV;
 import utils.Arquivos;
 
 public class Seguranca {
-	
-	private KeyPairGenerator assimetrica;
 	private PrivateKey chavePrivada;
 	private PublicKey chavePublica;
 	private PublicKey chavePublicaDestinatario;
-	private SecretKey chaveSimetrica;
-	
 	private Sessao sessao;  
 	
 	public Seguranca(){
@@ -46,6 +42,7 @@ public class Seguranca {
 	
 	private void gerarChaveAssimetrica() {
 		Security.addProvider(new org.bouncycastle.jce.provider.BouncyCastleProvider());
+		KeyPairGenerator assimetrica = null;
 
 		try {
 			assimetrica = KeyPairGenerator.getInstance("RSA", "BC");
@@ -64,7 +61,7 @@ public class Seguranca {
 	
 	public void salvarChavePublica() {
 		Arquivos.gravarObjeto(chavePublica, "publica");
-		System.out.println("Chave pÃºblica armazenada!");
+		System.out.println("Chave pública armazenada!");
 	}
 	
 	public void salvarChavePrivada() {
@@ -74,16 +71,16 @@ public class Seguranca {
 	
 	public void obterPublicaDestinatario() {		
 		chavePublicaDestinatario = (PublicKey) Arquivos.lerObjeto();
-		System.out.println("Chave pÃºblica lida com sucesso no cliente!");				
+		System.out.println("Chave pública lida com sucesso no cliente!");				
 	}
 	
 	public void chavePrivada() {		
 		chavePrivada = (PrivateKey) Arquivos.lerObjetoPrivada();
-		System.out.println("Chave privada lida com sucesso no cliente!");				
+		System.out.println("Chave privada lida com sucesso!");				
 	}
 	
 	/**
-	 * Criptografa o texto puro usando a chave pï¿½blica.
+	 * Criptografa o texto puro usando a chave pública.
 	 */
 	public byte[] criptografa(byte[] texto, PublicKey chave) {
 		byte[] cipherText = null;
@@ -212,19 +209,13 @@ public class Seguranca {
 		sessao.setChaveEncriptacaoServer(keyGenerator1.generateKey());
 		System.out.println("ENC SERVER: "+sessao.getChaveEncriptacaoServer());
 		
-		KeyGenerator keyGenerator2 = KeyGenerator.getInstance("AES");
-		keyGenerator2.init(256, new SecureRandom());
-		sessao.setChaveEncriptacaoClient(keyGenerator2.generateKey());
+		sessao.setChaveEncriptacaoClient(keyGenerator1.generateKey());
 		System.out.println("ENC CLIENT: "+sessao.getChaveEncriptacaoClient());
 		
-		KeyGenerator keyGenerator3 = KeyGenerator.getInstance("AES");
-		keyGenerator3.init(256, new SecureRandom());
-		sessao.setChaveAutenticacaoServer(keyGenerator3.generateKey());
+		sessao.setChaveAutenticacaoServer(keyGenerator1.generateKey());
 		System.out.println("AUT SERVER: "+sessao.getChaveAutenticacaoServer());
 		
-		KeyGenerator keyGenerator4 = KeyGenerator.getInstance("AES");
-		keyGenerator4.init(256, new SecureRandom());
-		sessao.setChaveAutenticacaoClient(keyGenerator4.generateKey());
+		sessao.setChaveAutenticacaoClient(keyGenerator1.generateKey());
 		System.out.println("AUT CLIENT: "+sessao.getChaveAutenticacaoClient());
 	}
 
@@ -234,14 +225,6 @@ public class Seguranca {
 
 	public void setChavePrivada(PrivateKey chavePrivada) {
 		this.chavePrivada = chavePrivada;
-	}
-
-	public KeyPairGenerator getAssimetrica() {
-		return assimetrica;
-	}
-
-	public void setAssimetrica(KeyPairGenerator assimetrica) {
-		this.assimetrica = assimetrica;
 	}
 
 	public PublicKey getChavePublica() {
@@ -260,14 +243,6 @@ public class Seguranca {
 		this.chavePublicaDestinatario = chavePublicaDestinatario;
 	}
 
-	public SecretKey getChaveSimetrica() {
-		return chaveSimetrica;
-	}
-
-	public void setChaveSimetrica(SecretKey chaveSimetrica) {
-		this.chaveSimetrica = chaveSimetrica;
-	}
-
 	public Sessao getSessao() {
 		return sessao;
 	}
@@ -275,16 +250,4 @@ public class Seguranca {
 	public void setSessao(Sessao sessao) {
 		this.sessao = sessao;
 	}
-	
-	
-	/*private void gerarChaveSimetrica() {
-	try {
-		KeyGenerator keygenerator = KeyGenerator.getInstance("AES");
-		chaveSimetrica = keygenerator.generateKey();
-		System.out.println("Chave simetrica criada com sucesso!");
-	} catch (NoSuchAlgorithmException e) {		
-		e.printStackTrace();
-	}
-}*/
-	
 }

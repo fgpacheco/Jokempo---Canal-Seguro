@@ -26,7 +26,7 @@ public class Cliente {
 
 	//Seguran�a
 	private Seguranca seguranca;	
-	
+
 	private Comunicacao comunicacao;
 
 	public Cliente(String host, int porta) {
@@ -55,17 +55,17 @@ public class Cliente {
 		try {
 			socket = new Socket(host, porta);   
 			System.out.println("Cliente conectado!");
-			
+
 			//seguranca.gerarChaves();
 			seguranca.obterPublicaDestinatario();
 			seguranca.criarChaveSessao();
-			
+
 			comunicacao =  new Comunicacao(socket, seguranca);
-			comunicacao.enviarChaveSimetrica();
+			comunicacao.enviarSessao();
 
 			//out = new ObjectOutputStream(socket.getOutputStream());
 			//in = new ObjectInputStream(socket.getInputStream());
-					
+
 
 		} catch (IOException ex) {
 			ex.printStackTrace();
@@ -74,19 +74,14 @@ public class Cliente {
 		}
 	}
 
-	public void enviar(Jogador j) {
-		//j.setAuth(seguranca.getSessao().getChaveAutenticacaoClient());
-		comunicacao.enviarObjeto(j, true);
+	public void enviar(Jogador j) {		
+		comunicacao.enviarObjetoCliente(j);
 	}
 
 	public Jogador receber() {
-				
-		if(seguranca.getSessao().getChaveAutenticacaoServer().equals(comunicacao.receberKeyAuth())) {
-			return (Jogador) comunicacao.receberObjeto(false);
-		} 
-		
-		return null;
-				
+
+		return (Jogador) comunicacao.receberObjetoServidor();
+
 	}
 
 }
