@@ -27,26 +27,21 @@ public class ClienteMain {
 		int escolha = scan.nextInt();
 		
 		Jogador jogador = new Jogador(nome, Partida.escolhaToString(escolha));
-		//String msg;		
 		
-		//msg = Conversor.convertToString(jogador);
-		c.enviar(jogador);
+		c.enviar(jogador);		
 		
-		//String resposta = null;
 		Jogador vencedor = null;
 
 		while(vencedor == null) {
 			try {
 				vencedor = c.receber();
-			} catch (Exception e) {
-				// TODO Auto-generated catch block
+			} catch (Exception e) {				
 				e.printStackTrace();
 			}								
 		}
 
-		//jogador = (Jogador) Conversor.convertFromString(resposta);
-
-		String resultado = (vencedor == null) ? "Empate" : vencedor.getNome() + " venceu: " + vencedor.getEscolha();
+		//String resultado = (vencedor == null) ? "Empate" : vencedor.getNome() + " venceu: " + vencedor.getEscolha();
+		String resultado = (vencedor.getNome().equals("Empate")) ? "Empate" : vencedor.getNome() + " venceu: " + vencedor.getEscolha();
 		
 		System.out.println(resultado);
 

@@ -23,7 +23,7 @@ public class ServidorThread implements Runnable{
 		try {
 
 			seguranca.setSessao(comunicacao.receberSessao());
-			
+
 			Jogador jogador = (Jogador) comunicacao.receberObjetoCliente();
 
 			while(jogador != null) {

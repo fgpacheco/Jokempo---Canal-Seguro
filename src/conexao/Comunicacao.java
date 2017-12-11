@@ -91,38 +91,12 @@ public class Comunicacao {
 		return s;
 	}
 	
-	/*public void enviarObjeto(Object obj, boolean client) {
-		try {
-			byte[] b = Conversor.convertToByteArray(obj);
-			byte[] b1;
-
-			if(client) {
-				output.writeObject(seguranca.getSessao().getChaveAutenticacaoClient());
-				b1 = seguranca.criptografaSimetrica(b, seguranca.getSessao().getChaveEncriptacaoClient());
-				output.writeObject(Conversor.byteArrayToString(b1));
-			} else {
-				output.writeObject(seguranca.getSessao().getChaveAutenticacaoServer());
-				b1 = seguranca.criptografaSimetrica(b, seguranca.getSessao().getChaveEncriptacaoServer());
-				output.writeObject(Conversor.byteArrayToString(b1));
-			}
-			
-			//output.writeObject(Conversor.byteArrayToString(b1));
-			
-		} catch (IOException e) {			
-			e.printStackTrace();
-		} catch (DataLengthException e) {			
-			e.printStackTrace();
-		} 		
-	}*/
-	
 	public void enviarObjetoCliente(Object obj) {
-		enviarObjeto(obj, seguranca.getSessao().getChaveAutenticacaoClient(),  seguranca.getSessao().getChaveEncriptacaoClient());
-		
+		enviarObjeto(obj, seguranca.getSessao().getChaveAutenticacaoClient(),  seguranca.getSessao().getChaveEncriptacaoClient());		
 	}
 	
 	public void enviarObjetoServidor(Object obj) {
-		enviarObjeto(obj, seguranca.getSessao().getChaveAutenticacaoServer(),  seguranca.getSessao().getChaveEncriptacaoServer());
-		
+		enviarObjeto(obj, seguranca.getSessao().getChaveAutenticacaoServer(),  seguranca.getSessao().getChaveEncriptacaoServer());		
 	}
 	
 	public void enviarObjeto(Object obj, SecretKey autenticacao, SecretKey encriptacao) {
@@ -134,10 +108,7 @@ public class Comunicacao {
 			
 			JogadorSent js = new JogadorSent(auth, encrypt);
 			
-			output.writeObject(js);
-			
-			//falta autenticar
-			//Criar um objeto para encapsular os dois byte []			
+			output.writeObject(Conversor.convertToString(js));
 			
 		} catch (IOException e) {			
 			e.printStackTrace();
@@ -158,7 +129,8 @@ public class Comunicacao {
 	
 	public Object receberObjeto(SecretKey autenticacao, SecretKey encriptacao) {
 		try {
-			JogadorSent js = (JogadorSent) input.readObject();
+			String str = (String) input.readObject();
+			JogadorSent js = (JogadorSent) Conversor.convertFromString(str);			
 			byte[] decrypt = seguranca.decriptografiaSimetrica(js.getEncriptacao(), encriptacao);
 			
 			Jogador j = (Jogador) Conversor.convertFromByteArray(decrypt);
