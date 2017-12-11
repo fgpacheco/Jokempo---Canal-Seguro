@@ -129,8 +129,8 @@ public class Comunicacao {
 		try {
 			byte[] b = Conversor.convertToByteArray(obj);			
 
-			byte[] auth = seguranca.autenticacao(b, autenticacao);
 			byte[] encrypt = seguranca.criptografaSimetrica(b, encriptacao);
+			byte[] auth = seguranca.autenticacao(b, autenticacao);
 			
 			JogadorSent js = new JogadorSent(auth, encrypt);
 			
@@ -160,7 +160,6 @@ public class Comunicacao {
 		try {
 			JogadorSent js = (JogadorSent) input.readObject();
 			byte[] decrypt = seguranca.decriptografiaSimetrica(js.getEncriptacao(), encriptacao);
-			
 			Jogador j = (Jogador) Conversor.convertFromByteArray(decrypt);
 			byte[] byteJogador = Conversor.convertToByteArray(j);
 			

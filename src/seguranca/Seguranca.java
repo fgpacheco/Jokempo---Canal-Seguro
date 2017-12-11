@@ -61,7 +61,7 @@ public class Seguranca {
 	
 	public void salvarChavePublica() {
 		Arquivos.gravarObjeto(chavePublica, "publica");
-		System.out.println("Chave pública armazenada!");
+		System.out.println("Chave pï¿½blica armazenada!");
 	}
 	
 	public void salvarChavePrivada() {
@@ -71,7 +71,7 @@ public class Seguranca {
 	
 	public void obterPublicaDestinatario() {		
 		chavePublicaDestinatario = (PublicKey) Arquivos.lerObjeto();
-		System.out.println("Chave pública lida com sucesso no cliente!");				
+		System.out.println("Chave pï¿½blica lida com sucesso no cliente!");				
 	}
 	
 	public void chavePrivada() {		
@@ -80,7 +80,7 @@ public class Seguranca {
 	}
 	
 	/**
-	 * Criptografa o texto puro usando a chave pública.
+	 * Criptografa o texto puro usando a chave pï¿½blica.
 	 */
 	public byte[] criptografa(byte[] texto, PublicKey chave) {
 		byte[] cipherText = null;
@@ -138,7 +138,7 @@ public class Seguranca {
         CBCBlockCipher cbcBlockCipher = new CBCBlockCipher(new AESEngine());
         BlockCipherPadding bcp = new PKCS7Padding();
         PaddedBufferedBlockCipher pbbc = new PaddedBufferedBlockCipher(cbcBlockCipher, bcp);
-
+        System.out.println("CHAVE:  "+ secret);
         int blockSize = cbcBlockCipher.getBlockSize();
         int inputOffset = 0;
         int inputLength = input.length;
@@ -162,7 +162,7 @@ public class Seguranca {
         }
 
         int outputLength = outputOffset + pbbc.processBytes(input, inputOffset, inputLength, output, outputOffset);
-
+//        System.out.println("OUTPUT:  "+pbbc.doFinal(output, outputLength));
         outputLength += pbbc.doFinal(output, outputLength);
 
         byte[] out = new byte[outputLength];

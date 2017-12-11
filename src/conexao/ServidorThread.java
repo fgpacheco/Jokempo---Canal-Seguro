@@ -23,8 +23,8 @@ public class ServidorThread implements Runnable{
 		try {
 
 			seguranca.setSessao(comunicacao.receberSessao());
-			
 			Jogador jogador = (Jogador) comunicacao.receberObjetoCliente();
+			System.out.println(Thread.currentThread().getName());
 
 			while(jogador != null) {
 				System.out.println(jogador.getNome());

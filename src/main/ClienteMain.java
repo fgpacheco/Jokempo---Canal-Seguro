@@ -2,6 +2,8 @@ package main;
 
 import java.util.Scanner;
 
+import javax.swing.plaf.synth.SynthSeparatorUI;
+
 import conexao.Cliente;
 import conexao.Servidor;
 import jogo.Jogador;

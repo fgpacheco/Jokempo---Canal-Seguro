@@ -10,6 +10,8 @@ import java.net.Socket;
 import java.security.NoSuchAlgorithmException;
 import java.security.PublicKey;
 
+import javax.swing.plaf.synth.SynthSeparatorUI;
+
 import jogo.Jogador;
 import seguranca.Seguranca;
 import utils.Conversor;

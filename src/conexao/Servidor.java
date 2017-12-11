@@ -40,7 +40,7 @@ public class Servidor {
 			serverSocket = new ServerSocket(PORTA);
 			executor = Executors.newFixedThreadPool(2);		
 			partida = new Partida();
-			seguranca = new Seguranca();
+//			seguranca = new Seguranca();
 		} catch (IOException e) {			
 			e.printStackTrace();
 		}
@@ -49,20 +49,18 @@ public class Servidor {
 	public void start() {
 		System.out.println("Aguardando o cliente...");	
 		
-		if(!Arquivos.isChavePublica()) {
-			seguranca.gerarChaves();
-			seguranca.salvarChavePublica();
-			seguranca.salvarChavePrivada();
-		}else {
-			seguranca.chavePrivada();
-		}		
-		
-		
 		while(true) {
 			try {
+				seguranca = new Seguranca();
+				if(!Arquivos.isChavePublica()) {
+					seguranca.gerarChaves();
+					seguranca.salvarChavePublica();
+					seguranca.salvarChavePrivada();
+				}else {
+					seguranca.chavePrivada();
+				}		
 				socket = serverSocket.accept();				
-				System.out.println("Cliente conectado");
-				
+				System.out.println("Cliente conectado");				
 				executor.execute(new ServidorThread(socket, contador, this, seguranca));
 				contador++;
 				
