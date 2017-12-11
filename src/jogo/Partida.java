@@ -21,6 +21,7 @@ public class Partida {
 		int escolhaJog1 = escolhaToInt(jogador1.getEscolha());
 		int escolhaJog2 = escolhaToInt(jogador2.getEscolha());
 		
+
 		if((escolhaJog1 - escolhaJog2) == 0) {			
 			return null;		
 		} else if((escolhaJog1 - escolhaJog2 == -1) || (escolhaJog1 - escolhaJog2 == 2)) {
@@ -65,9 +66,11 @@ public class Partida {
 		}
 	}
 	
+
 	/*
 	public static void main(String[] args) {
 		Jogador jogador1 = new Jogador("Felipe", "Pedra");
+
 		Jogador jogador2 = new Jogador("Samir", "Pedra");
 		
 		Partida partida = new Partida();

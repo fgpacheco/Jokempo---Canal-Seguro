@@ -16,6 +16,7 @@ public class ServidorThread implements Runnable{
 		this.servidor = servidor;
 		this.seguranca = seguranca;
 		this.comunicacao =  new Comunicacao(socket, seguranca);
+
 	}
 
 	@Override
@@ -28,7 +29,7 @@ public class ServidorThread implements Runnable{
 
 			while(jogador != null) {
 				System.out.println(jogador.getNome());
-
+        
 				synchronized (this.servidor) {					
 					servidor.getPartida().add(jogador);
 
@@ -39,7 +40,6 @@ public class ServidorThread implements Runnable{
 						//this.servidor.trava.wait();
 						this.servidor.wait();
 					}
-
 					Jogador vencedor = servidor.resultado();
 					comunicacao.enviarObjetoServidor(vencedor);
 				}
@@ -47,13 +47,11 @@ public class ServidorThread implements Runnable{
 				jogador = (Jogador) comunicacao.receberObjetoCliente();
 			}
 
-
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 
 	}
 
-
-
 }
+

@@ -28,11 +28,11 @@ public class Servidor {
 	private ExecutorService executor;
 	private int contador = 0;
 	private Partida partida;
-	
-	//Segurança
+
+	//Seguranï¿½a
 	private Seguranca seguranca;
 	
-	//Servirá como monitor
+	//Servirï¿½ como monitor
 	public Object trava = new Object();
 	
 	public Servidor() {
@@ -41,6 +41,7 @@ public class Servidor {
 			executor = Executors.newFixedThreadPool(2);		
 			partida = new Partida();
 //			seguranca = new Seguranca();
+
 		} catch (IOException e) {			
 			e.printStackTrace();
 		}
@@ -63,7 +64,6 @@ public class Servidor {
 				System.out.println("Cliente conectado");				
 				executor.execute(new ServidorThread(socket, contador, this, seguranca));
 				contador++;
-				
 			} catch (IOException e) {				
 				e.printStackTrace();
 			}				
@@ -82,6 +82,5 @@ public class Servidor {
 		return partida.vencedor();	
 	}
 	
-	
-	
 }
+

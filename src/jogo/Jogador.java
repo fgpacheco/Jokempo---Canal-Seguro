@@ -1,7 +1,6 @@
 package jogo;
 
 import java.io.Serializable;
-
 import javax.crypto.SecretKey;
 
 public class Jogador implements Serializable {
@@ -30,6 +29,7 @@ public class Jogador implements Serializable {
 	public void setEscolha(String escolha) {
 		this.escolha = escolha;
 	}
+  
 	/*
 
 	public SecretKey getAuth() {
