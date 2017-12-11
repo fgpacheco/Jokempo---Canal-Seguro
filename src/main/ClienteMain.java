@@ -1,7 +1,7 @@
 package main;
 
-import java.io.IOException;
 import java.util.Scanner;
+
 import conexao.Cliente;
 import conexao.Servidor;
 import jogo.Jogador;
@@ -22,30 +22,33 @@ public class ClienteMain {
 		System.out.println("Escolha uma jogada:\n" +
 				"1 - Papel\n" + 
 				"2 - Pedra\n" +
-				"3 - Tesoura\n" +
-				"0 - SAIR\n");
+				"3 - Tesoura\n");
 		
 		int escolha = scan.nextInt();
 		
 		Jogador jogador = new Jogador(nome, Partida.escolhaToString(escolha));
-		String msg;
+		//String msg;		
 		
+		//msg = Conversor.convertToString(jogador);
+		c.enviar(jogador);
 		
-		
-		msg = Jogador.convertToString(jogador);
-		c.enviar(msg);
-		
-		String s = null;
-		
-		try {
-			while(s == null) {
-				s = c.receber();								
-			}
-		} catch (IOException e) {			
-			e.printStackTrace();
+		//String resposta = null;
+		Jogador vencedor = null;
+
+		while(vencedor == null) {
+			try {
+				vencedor = c.receber();
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}								
 		}
+
+		//jogador = (Jogador) Conversor.convertFromString(resposta);
+
+		String resultado = (vencedor == null) ? "Empate" : vencedor.getNome() + " venceu: " + vencedor.getEscolha();
 		
-		System.out.println(s);
+		System.out.println(resultado);
 
 	}
 }
