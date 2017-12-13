@@ -5,9 +5,11 @@ import java.util.ArrayList;
 public class Partida {
 	
 	private ArrayList<Jogador> jogadores;
+	private Jogador empate;
 	
 	public Partida() {
 		jogadores = new ArrayList<>();
+		empate = new Jogador("Empate", "0");
 	}
 	
 	public void add(Jogador jogador) {
@@ -23,7 +25,7 @@ public class Partida {
 		
 
 		if((escolhaJog1 - escolhaJog2) == 0) {			
-			return null;		
+			return empate;		
 		} else if((escolhaJog1 - escolhaJog2 == -1) || (escolhaJog1 - escolhaJog2 == 2)) {
 			return jogador1;
 		} else {
@@ -66,25 +68,5 @@ public class Partida {
 		}
 	}
 	
-
-	/*
-	public static void main(String[] args) {
-		Jogador jogador1 = new Jogador("Felipe", "Pedra");
-
-		Jogador jogador2 = new Jogador("Samir", "Pedra");
-		
-		Partida partida = new Partida();
-		
-		partida.add(jogador1);
-		partida.add(jogador2);
-		
-		for(Jogador j : partida.getJogadores()) {
-			System.out.println(j.getNome() + " " + j.getEscolha());
-		}
-		 
-		Jogador v = partida.vencedor();
-		System.out.println(v == null ? "Empate" : v.getNome());
-	}
-	*/
 
 }

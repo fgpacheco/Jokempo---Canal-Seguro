@@ -47,7 +47,7 @@ public class ClienteMain {
 
 		//jogador = (Jogador) Conversor.convertFromString(resposta);
 
-		String resultado = (vencedor == null) ? "Empate" : vencedor.getNome() + " venceu: " + vencedor.getEscolha();
+		String resultado = (vencedor.getNome().equals("Empate") ? "Jogo empatado" : vencedor.getNome() + " venceu: " + vencedor.getEscolha());
 		
 		System.out.println(resultado);
 
